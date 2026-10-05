@@ -1,0 +1,184 @@
+/* WhyTime history / analytics page style. 描述行为，不评价用户：无评分、
+ * 无红黄绿、无排名，只有事实与汇总。 */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+	background: #f3f4f6;
+	color: #1a1d21;
+	font: 14px/1.6 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+	padding: 32px 16px 60px;
+}
+
+.hs-page {
+	max-width: 760px;
+	margin: 0 auto;
+}
+
+.hs-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	margin-bottom: 14px;
+}
+
+h1 { font-size: 20px; }
+
+.hs-sub { color: #6b7280; font-size: 12.5px; margin-top: 2px; }
+
+.hs-settings-link {
+	color: #374151;
+	font-size: 13px;
+	text-decoration: none;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	padding: 6px 12px;
+	background: #fff;
+}
+
+.hs-cap {
+	margin: 10px 0 14px;
+	padding: 9px 12px;
+	background: #fef3c7;
+	border-radius: 10px;
+	font-size: 12.5px;
+	color: #713f12;
+}
+
+.hs-card {
+	background: #fff;
+	border-radius: 16px;
+	padding: 20px 22px;
+	margin-bottom: 16px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+h2 { font-size: 15px; margin-bottom: 12px; }
+
+.hs-hint { color: #6b7280; font-size: 12.5px; margin-top: 10px; }
+
+/* ---- 概览 ---- */
+
+.hs-overview .ov-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 10px;
+	margin-bottom: 14px;
+}
+
+.ov-item {
+	background: #f9fafb;
+	border-radius: 10px;
+	padding: 12px 14px;
+}
+
+.ov-item .k { font-size: 12px; color: #6b7280; }
+.ov-item .v { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ov-item .v small { font-size: 12px; font-weight: 600; color: #6b7280; }
+
+.ov-line { font-size: 13px; color: #374151; line-height: 1.8; }
+
+/* ---- 日报 ---- */
+
+.hs-daybar { margin-bottom: 12px; }
+
+select {
+	border: 1px solid #d1d5db;
+	border-radius: 10px;
+	padding: 8px 10px;
+	font-size: 13px;
+	background: #fff;
+	color: #1a1d21;
+}
+
+.hs-subhead {
+	font-size: 12px;
+	font-weight: 600;
+	color: #6b7280;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin: 14px 0 8px;
+}
+
+.hs-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13.5px;
+}
+
+.hs-table th {
+	text-align: left;
+	font-weight: 600;
+	color: #6b7280;
+	font-size: 12px;
+	padding: 6px 8px;
+	border-bottom: 1px solid #eceef1;
+}
+
+.hs-table td {
+	padding: 7px 8px;
+	border-bottom: 1px solid #f3f4f6;
+}
+
+.hs-table td.num, .hs-table th.num {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+.hs-planvs {
+	display: flex;
+	gap: 10px;
+	margin-top: 12px;
+	flex-wrap: wrap;
+}
+
+.hs-planvs .pv {
+	flex: 1;
+	min-width: 120px;
+	background: #f9fafb;
+	border-radius: 10px;
+	padding: 10px 14px;
+}
+
+.hs-planvs .pv .k { font-size: 12px; color: #6b7280; }
+.hs-planvs .pv .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.hs-delta-over { color: #b45309; }
+.hs-empty { color: #9ca3af; font-size: 13px; padding: 14px 0; text-align: center; }
+
+/* ---- 记录表 ---- */
+
+.hs-scroll { max-height: 420px; overflow: auto; }
+
+.reason-cell {
+	max-width: 220px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: #4b5563;
+}
+
+/* ---- 操作 ---- */
+
+.hs-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.hs-btn {
+	appearance: none;
+	border: 1px solid #d1d5db;
+	background: #fff;
+	color: #1a1d21;
+	border-radius: 10px;
+	padding: 10px 16px;
+	font-size: 13.5px;
+	cursor: pointer;
+	font-family: inherit;
+}
+
+.hs-btn:hover { filter: brightness(0.97); }
+
+.hs-danger { border-color: #b91c1c; color: #b91c1c; }
+
+.hs-danger.confirm {
+	background: #b91c1c;
+	color: #fff;
+}

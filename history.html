@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>WhyTime · 使用记录与数据分析</title>
+		<link rel="stylesheet" href="history.css" type="text/css">
+	</head>
+
+	<body>
+
+		<main class="hs-page">
+
+			<header class="hs-header">
+				<div>
+					<h1>使用记录与数据分析</h1>
+					<p class="hs-sub">所有数据只保存在本机，可随时导出带走。</p>
+				</div>
+				<a class="hs-settings-link" href="options.html">设置 →</a>
+			</header>
+
+			<p id="capNotice" class="hs-cap" hidden>
+				最多保存最近 1000 次使用记录，超出后删除最旧记录，建议定期导出。
+			</p>
+
+			<section class="hs-card">
+				<h2>概览</h2>
+				<div id="overview" class="hs-overview">加载中…</div>
+			</section>
+
+			<section class="hs-card">
+				<h2>日报</h2>
+				<div class="hs-daybar">
+					<select id="daySelect"></select>
+				</div>
+				<div id="dailyReport">加载中…</div>
+			</section>
+
+			<section class="hs-card">
+				<h2>使用记录</h2>
+				<div id="recordList">加载中…</div>
+			</section>
+
+			<section class="hs-card">
+				<h2>导出与清理</h2>
+				<p class="hs-hint">数据完全由浏览器本地生成，不会上传服务器。</p>
+				<div class="hs-actions">
+					<button type="button" id="exportJson" class="hs-btn">导出记录（JSON）</button>
+					<button type="button" id="exportCsv" class="hs-btn">导出记录（CSV）</button>
+					<button type="button" id="clearBtn" class="hs-btn hs-danger">清空使用记录</button>
+				</div>
+				<p class="hs-hint" id="clearHint">清空不可恢复（不影响进行中的使用），建议先导出备份。</p>
+			</section>
+
+		</main>
+
+		<script src="wt-stats.js"></script>
+		<script src="history.js"></script>
+	</body>
+
+</html>

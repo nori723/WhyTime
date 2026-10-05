@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>WhyTime · 设置</title>
+		<link rel="stylesheet" href="options.css" type="text/css">
+	</head>
+
+	<body>
+
+		<main>
+
+			<header>
+				<h1>WhyTime</h1>
+				<p class="tagline">打开之前，先想清楚为什么。</p>
+				<p class="tagline"><a href="history.html" class="history-link">使用记录与数据分析 →</a></p>
+			</header>
+
+			<section>
+				<div class="section-head">
+					<h2>需要理由的网站</h2>
+					<button type="button" id="save" class="save-inline">保存设置</button>
+				</div>
+				<p class="hint">每行一个域名，例如 bilibili.com。打开这些网站时，需要先说明理由和时间预算。</p>
+				<textarea id="sites" rows="8" spellcheck="false" placeholder="bilibili.com&#10;youtube.com"></textarea>
+				<p><span id="savedTip" class="tip" hidden>已保存 ✓</span></p>
+				<label>无目的刷完之后，去这里：</label>
+				<div class="alt-row">
+					<input type="text" id="altName" maxlength="20" placeholder="替代动作，例如 阅读">
+					<input type="url" id="altUrl" placeholder="链接（可选），例如 https://weread.qq.com/web">
+				</div>
+				<p class="hint">可以用 <code>|</code> 分隔多条（如 <code>阅读|运动</code>），出现时随机取一条；清空名称 = 不显示建议。</p>
+				<p class="hint">每行一条，两种写法可混用：<br>
+					① 域名（含点号）：<code>bilibili.com</code> —— 精确匹配该域名及其全部子域名，不误伤其他网站；<br>
+					② 关键词（不含点号）：<code>bilibili</code> —— 所有主机名含该词的网站都一起约束（含 bilibili.com/.tv 及任意后缀；注意 notbilibili.com 这类含词域名也会被算入）。大小写随意，保存时自动转小写。</p>
+			</section>
+
+			<section>
+				<div class="section-head">
+					<h2>续时</h2>
+					<button type="button" id="save2" class="save-inline">保存设置</button>
+				</div>
+				<p class="hint">到期后允许的续时次数；达到上限后只能结束使用，不提供无限续时。改完这里点右侧保存（与名单一起保存）。</p>
+				<select id="maxExtensions">
+					<option value="0" selected>0 次（默认，不允许续时）</option>
+					<option value="1">1 次</option>
+					<option value="2">2 次</option>
+					<option value="3">3 次</option>
+				</select>
+				<p><span id="savedTip2" class="tip" hidden>已保存 ✓</span></p>
+			</section>
+
+			<section>
+				<div class="section-head">
+					<h2>睡觉锁定</h2>
+					<button type="button" id="save3" class="save-inline">保存设置</button>
+				</div>
+				<p class="hint">宵禁时段内，受限网站无论是否在使用都会被锁到睡觉页，无任何绕过入口；默认 22:00 – 次日 06:00。开始等于结束则关闭宵禁。</p>
+				<div class="curfew-row">
+					<span class="unit">每天</span>
+					<input type="time" id="curfewStart" value="22:00">
+					<span class="unit">至次日</span>
+					<input type="time" id="curfewEnd" value="06:00">
+				</div>
+				<p><span id="savedTip3" class="tip" hidden>已保存 ✓</span></p>
+			</section>
+
+			<section>
+				<h2>当前 Session 状态</h2>
+				<p class="hint">调试用：Session 的唯一权威保存在本机存储中，这里只读展示。</p>
+				<pre id="sessionBox">读取中…</pre>
+				<button type="button" id="refreshSession" class="secondary">刷新状态</button>
+			</section>
+
+		</main>
+
+		<script src="common.js"></script>
+		<script src="wt-util.js"></script>
+		<script src="options.js"></script>
+	</body>
+
+</html>

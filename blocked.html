@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>WhyTime</title>
+		<link rel="stylesheet" href="blocked.css" type="text/css">
+	</head>
+
+	<body>
+
+		<main class="wt-page">
+
+			<header class="wt-header">
+				<p class="wt-brand">WhyTime</p>
+				<p class="wt-tagline">打开之前，先想清楚为什么。</p>
+				<p id="todayUsage" class="wt-today" hidden></p>
+			</header>
+
+			<div id="view" class="wt-view">
+				<!-- 视图由 blocked.js 按后台下发的状态渲染 -->
+				<p class="wt-loading">加载中…</p>
+			</div>
+
+			<footer class="wt-footer">
+				<p class="wt-motto">带着目的去使用，不忘初心。</p>
+			</footer>
+
+		</main>
+
+		<script src="blocked.js"></script>
+	</body>
+
+</html>

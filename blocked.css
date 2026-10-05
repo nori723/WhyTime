@@ -1,0 +1,654 @@
+/* WhyTime blocked page style — Flow 式清爽卡片 + 清新绿主色（v0.9.9）。
+ *
+ * 字体：Manrope 可变字体（wght 200–800，SIL 风格宽松许可，见 fonts/MANROPE-LICENSE.txt），
+ *       中文回退系统字体——与 Flow 的字体栈同构。
+ * 卡片：实心白卡 + 细描边 + 轻投影（Flow light 的做法）——半透明玻璃会让画面发蒙、
+ *       没有重点（v0.9.5–0.9.7 教训），实心卡才能立住层级。
+ * 交互：保留悬停上浮/按压回弹微交互，尊重 prefers-reduced-motion。
+ *
+ * 四种状态（Gate / Expired+Promise / Ended / Active）共用本视觉体系。
+ */
+
+@font-face {
+	font-family: "Manrope";
+	src: url("fonts/manrope.woff2") format("woff2");
+	font-weight: 200 800;
+	font-style: normal;
+	font-display: swap;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+	--green-1: #30d158;   /* Apple 绿（亮） */
+	--green-2: #0fa958;   /* Apple 绿（深） */
+	--red-1: #ff6961;
+	--red-2: #ff3b30;
+	--ink: #0c0a09;       /* 主文字（Flow light 同款近黑） */
+	--ink-2: #6e6e73;     /* 次级灰 */
+	--bd: #e2e8f0;        /* 卡片/控件描边（Flow light 同款） */
+	--surface: #f6f8f7;   /* 输入面板浅底 */
+}
+
+body {
+	min-height: 100vh;
+	display: flex;
+	padding: 28px 16px;
+	/* 页面底色：极淡的绿白渐变 + 细噪点，给实心卡一个安静的舞台 */
+	background:
+		radial-gradient(900px 540px at 86% -8%, rgba(48, 209, 88, 0.10), transparent 62%),
+		radial-gradient(820px 520px at 4% 104%, rgba(36, 174, 214, 0.07), transparent 58%),
+		linear-gradient(165deg, #eefaf2 0%, #f7fcf9 55%, #eef4fb 100%);
+	color: var(--ink);
+	font: 14px/1.6 "Manrope", system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* 细噪点材质层（只作用于页面背景，卡片为实心不受影响） */
+body::before {
+	content: "";
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 0;
+	opacity: 0.4;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+.wt-page {
+	position: relative;
+	z-index: 1;
+	width: min(460px, 100%);
+	margin: auto; /* 内容超高时自然滚动，不会裁顶 */
+	background: #ffffff;
+	border: 1px solid var(--bd);
+	border-radius: 18px;
+	padding: 30px 30px 22px;
+	box-shadow: 0 8px 30px rgba(15, 40, 30, 0.06), 0 1px 3px rgba(15, 40, 30, 0.05);
+}
+
+/* ---- header / footer（所有状态共用） ---- */
+
+.wt-header {
+	text-align: center;
+	padding-bottom: 18px;
+	border-bottom: 1px solid var(--bd);
+	margin-bottom: 22px;
+}
+
+.wt-brand {
+	font-size: 20px;
+	font-weight: 800;
+	letter-spacing: 0.2px;
+	color: var(--green-2);
+	display: inline-block;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+	.wt-brand {
+		background: linear-gradient(120deg, var(--green-2), var(--green-1) 55%, #5fd88a);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		-webkit-text-fill-color: transparent;
+	}
+}
+
+.wt-tagline {
+	margin-top: 4px;
+	font-size: 12.5px;
+	color: var(--ink-2);
+}
+
+/* 今日累计：辅助信息，绿色点题，tabular 数字（Manrope 数字观感） */
+.wt-today {
+	margin-top: 10px;
+	font-size: 13px;
+	color: var(--green-2);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+
+.wt-footer {
+	margin-top: 26px;
+	padding-top: 14px;
+	border-top: 1px solid var(--bd);
+	text-align: center;
+}
+
+.wt-motto {
+	font-size: 12px;
+	color: #98989d;
+	letter-spacing: 1px;
+}
+
+/* ---- 状态标题区：层级从 800 到 400 拉开 ---- */
+
+h1 {
+	font-size: 21px;
+	font-weight: 800;
+	color: var(--ink);
+	letter-spacing: -0.2px;
+}
+
+.state-sub {
+	margin-top: 5px;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--ink-2);
+}
+
+.state-head { margin-bottom: 18px; }
+
+/* ---- 事实行（Expired） ---- */
+
+.facts { margin: 4px 0 6px; }
+
+.fact {
+	display: flex;
+	justify-content: space-between;
+	padding: 8px 2px;
+	font-size: 13.5px;
+	border-bottom: 1px dashed var(--bd);
+}
+
+.fact:last-child { border-bottom: 0; }
+
+.fact .k { color: var(--ink-2); font-weight: 500; }
+.fact .v { font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* ---- 表单共用 ---- */
+
+label {
+	display: block;
+	margin: 18px 0 8px;
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--ink);
+}
+
+.chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+/* 时长档两排对齐：固定 4 列网格（7 档 = 4+3） */
+.chips-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+}
+
+.chips-grid .chip {
+	text-align: center;
+	padding: 7px 4px;
+}
+
+.next-action-line {
+	margin: 10px 0 2px;
+	padding: 9px 12px;
+	background: rgba(48, 209, 88, 0.08);
+	border-radius: 10px;
+	font-size: 13px;
+	color: #166534;
+}
+
+.chip {
+	appearance: none;
+	border: 1px solid var(--bd);
+	background: #fff;
+	color: var(--ink);
+	border-radius: 999px;
+	padding: 7px 15px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	font-family: inherit;
+	transition: transform 0.16s ease, box-shadow 0.16s ease,
+			background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+/* 悬停微交互：轻轻上浮 + 绿色描边 + 柔和投影 */
+.chip:hover:not(.on) {
+	transform: translateY(-1px);
+	border-color: rgba(48, 209, 88, 0.5);
+	box-shadow: 0 4px 14px rgba(48, 209, 88, 0.16);
+}
+
+.chip:active { transform: translateY(0) scale(0.97); }
+
+.chip.on {
+	background: linear-gradient(135deg, var(--green-1), var(--green-2));
+	color: #fff;
+	border-color: transparent;
+	box-shadow: 0 4px 14px rgba(48, 209, 88, 0.3);
+}
+
+.chip:focus-visible, textarea:focus-visible, input:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 4px rgba(48, 209, 88, 0.22);
+}
+
+textarea {
+	width: 100%;
+	min-height: 64px;
+	resize: vertical;
+	border: 1px solid var(--bd);
+	border-radius: 14px;
+	padding: 11px 12px;
+	font: 14px/1.5 inherit;
+	color: var(--ink);
+	background: #fff;
+	transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+textarea:focus {
+	outline: none;
+	border-color: var(--green-1);
+	box-shadow: 0 0 0 4px rgba(48, 209, 88, 0.15);
+}
+
+/* 自定义时长输入：浅面板独立成块，与快捷档位保持区隔 */
+.custom-duration {
+	margin-top: 26px;
+	padding: 12px 14px;
+	background: var(--surface);
+	border: 1px solid var(--bd);
+	border-radius: 14px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.custom-duration .num {
+	width: 96px;
+	border: 1px solid var(--bd);
+	border-radius: 10px;
+	padding: 8px 10px;
+	font: 600 14px inherit;
+	font-family: inherit;
+	color: var(--ink);
+	background: #fff;
+	transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.custom-duration .num:focus {
+	outline: none;
+	border-color: var(--green-1);
+	box-shadow: 0 0 0 4px rgba(48, 209, 88, 0.15);
+}
+
+.custom-duration .unit { color: var(--ink-2); font-size: 13px; }
+
+.end-hint {
+	margin-top: 8px;
+	font-size: 12.5px;
+	color: var(--ink-2);
+	min-height: 1em;
+}
+
+/* 原因输入行的复制小按钮（小、灰、状态反馈就地变化） */
+.label-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 18px 0 8px;
+}
+
+.label-row label { margin: 0; }
+
+.copy-btn {
+	appearance: none;
+	border: 1px solid var(--bd);
+	background: #fff;
+	color: var(--ink-2);
+	border-radius: 999px;
+	padding: 3px 12px;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	font-family: inherit;
+	transition: transform 0.16s ease, box-shadow 0.16s ease,
+			color 0.16s ease, border-color 0.16s ease, background-color 0.16s ease;
+}
+
+.copy-btn:hover:not(:disabled) {
+	transform: translateY(-1px);
+	color: var(--ink);
+	border-color: rgba(48, 209, 88, 0.5);
+	box-shadow: 0 4px 12px rgba(48, 209, 88, 0.14);
+}
+
+.copy-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.copy-btn.done {
+	color: #0f7a3d;
+	border-color: rgba(48, 209, 88, 0.4);
+	background: rgba(48, 209, 88, 0.1);
+	opacity: 1;
+}
+
+/* ---- 按钮 ---- */
+
+/* 主要操作：清新绿渐变；悬停上浮放大 + 投影加深，按压回弹 */
+.btn-primary {
+	display: block;
+	width: 100%;
+	margin-top: 26px;
+	appearance: none;
+	border: 0;
+	border-radius: 14px;
+	background: linear-gradient(135deg, var(--green-1), var(--green-2));
+	color: #fff;
+	padding: 13px;
+	font-size: 15px;
+	font-weight: 700;
+	cursor: pointer;
+	font-family: inherit;
+	box-shadow: 0 10px 26px rgba(48, 209, 88, 0.32);
+	transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.3, 1.2),
+			box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+	transform: translateY(-1px) scale(1.01);
+	box-shadow: 0 14px 34px rgba(48, 209, 88, 0.42);
+	filter: saturate(1.08) brightness(1.03);
+}
+
+.btn-primary:active:not(:disabled) {
+	transform: translateY(0) scale(0.985);
+	box-shadow: 0 6px 16px rgba(48, 209, 88, 0.28);
+}
+
+/* 禁用态退为浅灰细描边，不与主按钮争夺注意力 */
+.btn-primary:disabled {
+	background: #f1f3f5;
+	color: #b0b4ba;
+	box-shadow: none;
+	cursor: not-allowed;
+}
+
+.btn-secondary {
+	appearance: none;
+	border: 1px solid var(--bd);
+	background: #fff;
+	color: var(--ink);
+	border-radius: 14px;
+	padding: 11px 16px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	font-family: inherit;
+	transition: transform 0.16s ease, box-shadow 0.16s ease,
+			background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+	transform: translateY(-1px);
+	box-shadow: 0 6px 18px rgba(15, 40, 30, 0.08);
+}
+
+.btn-secondary:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+
+.btn-block { display: block; width: 100%; margin-top: 10px; }
+
+.btn-row {
+	display: flex;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+.btn-row > button { flex: 1; }
+
+.btn-danger {
+	border-color: rgba(255, 59, 48, 0.4);
+	color: var(--red-2);
+	background: rgba(255, 59, 48, 0.05);
+}
+
+.btn-danger:hover:not(:disabled) {
+	border-color: var(--red-2);
+	box-shadow: 0 6px 18px rgba(255, 59, 48, 0.14);
+}
+
+.btn-danger-solid {
+	background: linear-gradient(135deg, var(--red-1), var(--red-2));
+	border-color: transparent;
+	color: #fff;
+	box-shadow: 0 10px 26px rgba(255, 59, 48, 0.28);
+}
+
+.btn-danger-solid:hover:not(:disabled) {
+	transform: translateY(-1px) scale(1.01);
+	box-shadow: 0 14px 32px rgba(255, 59, 48, 0.36);
+}
+
+.error-line {
+	margin-top: 12px;
+	color: var(--red-2);
+	font-size: 13px;
+}
+
+/* Expired 页内展开的承诺表单 */
+.promise-box {
+	margin-top: 20px;
+	padding: 18px;
+	background: var(--surface);
+	border: 1px solid var(--bd);
+	border-radius: 16px;
+}
+
+.promise-box h2 {
+	font-size: 15px;
+	font-weight: 800;
+}
+
+/* 到期后的偏离回顾框 */
+.review-box {
+	margin-top: 16px;
+	padding: 16px 18px;
+	background: var(--surface);
+	border: 1px solid var(--bd);
+	border-radius: 14px;
+}
+
+.review-box h2 {
+	font-size: 14px;
+	font-weight: 800;
+	margin-bottom: 4px;
+}
+
+.review-box .btn-row { margin-top: 12px; }
+
+.review-box .btn-primary { margin-top: 14px; }
+
+.review-box textarea {
+	background: #fff;
+}
+
+.limit-note {
+	margin-top: 14px;
+	padding: 10px 14px;
+	background: rgba(255, 214, 10, 0.14);
+	border-radius: 12px;
+	font-size: 13px;
+	line-height: 1.6;
+	color: #8a6116;
+}
+
+/* 计时条 ×（提前结束）后的轻量鼓励语：描述语气，无价值判断 */
+.encourage {
+	margin: 14px 0 4px;
+	padding: 10px 14px;
+	background: rgba(48, 209, 88, 0.1);
+	border-radius: 12px;
+	font-size: 13px;
+	color: #0f7a3d;
+	text-align: center;
+}
+
+/* 提前收场的"省下的时间"：事实陈述，把提前退出框定为收益而非损失 */
+.saved-note {
+	margin: 12px 0 2px;
+	padding: 10px 14px;
+	background: rgba(48, 209, 88, 0.08);
+	border-radius: 12px;
+	font-size: 13.5px;
+	color: #166534;
+}
+
+/* 替代动作（邀请语气，礼物感不是任务感） */
+.alt-box {
+	margin: 14px 0 2px;
+	padding: 12px 16px;
+	background: rgba(48, 209, 88, 0.08);
+	border-radius: 12px;
+	text-align: center;
+}
+
+.alt-q {
+	font-size: 13px;
+	color: var(--ink-2);
+}
+
+.alt-link {
+	display: inline-block;
+	margin-top: 4px;
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--green-2);
+	text-decoration: none;
+}
+
+a.alt-link:hover { text-decoration: underline; }
+
+.alt-inline {
+	margin-top: 12px;
+	font-size: 13px;
+	color: var(--ink-2);
+}
+
+.alt-inline .alt-link {
+	display: inline;
+	margin: 0 0 0 4px;
+	font-size: 13.5px;
+}
+
+.prev-reasons {
+	margin: 10px 0 0;
+	font-size: 12.5px;
+	color: #8a6116;
+	line-height: 1.7;
+}
+
+.ext-count-line {
+	margin: 0 0 10px;
+	font-size: 12.5px;
+	font-weight: 700;
+	color: #8a6116;
+}
+
+/* 久坐强制拉伸休息：大倒计时 + 拉伸清单 */
+.break-timer {
+	font-size: 44px;
+	font-weight: 800;
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+	color: var(--green-2);
+	margin: 8px 0 14px;
+}
+
+.stretch-list {
+	background: var(--surface);
+	border: 1px solid var(--bd);
+	border-radius: 12px;
+	padding: 12px 16px;
+	font-size: 13.5px;
+	line-height: 2;
+}
+
+.stretch-list p { margin: 0; }
+
+/* Gate 预算引导：对抗"预算授予感"——短预算少留跑偏空间 */
+.gate-nudge {
+	margin: -4px 0 8px;
+	font-size: 12px;
+	color: #9ca3af;
+}
+
+/* 明天的你（视角切换必答） */
+.tomorrow-box {
+	margin: 18px 0 8px;
+	padding: 12px 16px;
+	background: var(--surface);
+	border: 1px solid var(--bd);
+	border-radius: 14px;
+}
+
+.tomorrow-q {
+	font-size: 13px;
+	color: var(--ink);
+}
+
+.tomorrow-box .chips { margin-top: 8px; }
+
+/* 睡觉锁定页 */
+.sleep-moon {
+	font-size: 44px;
+	text-align: center;
+	margin: 10px 0 14px;
+}
+
+/* 到期页结束按钮：文字=你写的"接下来去"，字号由 JS 按长度设置 */
+#endBtn { word-break: break-all; }
+
+/* 预计结束提示：时长标签右侧，加大加粗突出（v0.16.1） */
+.label-row .end-hint {
+	margin: 0;
+	font-size: 15px;
+	font-weight: 800;
+	color: var(--green-2);
+	background: rgba(48, 209, 88, 0.1);
+	padding: 4px 12px;
+	border-radius: 999px;
+	font-variant-numeric: tabular-nums;
+}
+
+/* 回合间冷静期：今日次数提示 + 冷却倒计时（连续使用越多缓冲越长） */
+.gate-count {
+	margin: 10px 0 0;
+	padding: 8px 12px;
+	background: rgba(255, 214, 10, 0.14);
+	border-radius: 10px;
+	font-size: 12.5px;
+	color: #8a6116;
+	font-variant-numeric: tabular-nums;
+}
+
+.cooldown-line {
+	margin: 10px 0 0;
+	font-size: 13px;
+	font-weight: 700;
+	color: #b45309;
+	font-variant-numeric: tabular-nums;
+}
+
+.hidden { display: none; }
+
+.wt-loading {
+	text-align: center;
+	color: #98989d;
+	padding: 24px 0;
+}
+
+/* 尊重系统"减少动态效果"：关闭位移类微交互，保留瞬时状态变化 */
+@media (prefers-reduced-motion: reduce) {
+	* { transition-duration: 0.01ms !important; }
+	.btn-primary:hover:not(:disabled),
+	.btn-secondary:hover:not(:disabled),
+	.chip:hover:not(.on),
+	.copy-btn:hover:not(:disabled) {
+		transform: none;
+	}
+}
