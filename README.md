@@ -135,9 +135,8 @@ WhyTime 走第三条路：**不禁止，但要求先承诺**。打开名单里�
 ## 开发
 
 - 零依赖、零构建：改完代码在 `chrome://extensions` 点"重新加载"即生效
-- `tests/` 内置三个测试套件（Node 直接跑）：`test-flow.js`（Session 状态机，306 项）、`test-sites.js`（匹配语义，33 项）、`test-dom.js`（DOM 渲染接线，32 项），共 **371 项断言**
+- 核心代码分布：`background.js`（Session 状态机与消息分发）、`blocked.js`（阻断页各视图）、`content.js`（计时条与页面判定）、`wt-util.js`（名单匹配与默认值）、`wt-stats.js`（统计与导出，纯函数）
 - 架构要点：`chrome.storage.local` 是唯一权威状态；计时权威 = `plannedEndTime` 与 `Date.now()` 比较（`chrome.alarms` 兜底），不依赖页面存活；`blocked.html` 是唯一阻断层，跳转只由 background 执行，返回地址经一次性令牌签发、绝不进 URL 参数
-- 设计过程文档：[`PHASE0.md`](PHASE0.md)（源码调研与架构决策）、[`TESTING.md`](TESTING.md)（手动测试手册与已知限制）
 
 ## 路线图与已知取舍
 
