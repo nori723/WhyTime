@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "WhyTime",
-	"version": "0.16.1",
+	"version": "0.16.2",
 	"description": "打开之前，先想清楚为什么。",
 
 	"icons": {

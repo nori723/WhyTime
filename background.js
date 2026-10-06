@@ -613,8 +613,12 @@ async function handleMessage(message, sender) {
 					returnUrl: ctx.returnUrl
 				};
 			}
-			const lastEnded = await getLastEnded();
-			if (lastEnded && hostMatchesSite(ctx.host, lastEnded.domain)) {
+			// 收场页（v0.16.2）只在"结束瞬间"出现一次：× / 对齐检查中结束的
+			// 重定向 ctx 自带 encourage/savedMin 标记。此后的任何新进站一律
+			// 直达 Gate 承诺表单——冷静期与今日次数在表单上展示、由
+			// start-session 强制；不再用 lastEnded 把站点粘在收场页，
+			// 导致每次回来都多按一次"重新开始"。
+			if (ctx.encourage || typeof ctx.savedMin === "number") {
 				return {
 					view: "ended",
 					durations: settings.durations,
